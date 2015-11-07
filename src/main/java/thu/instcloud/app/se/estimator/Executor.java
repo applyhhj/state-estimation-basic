@@ -41,7 +41,7 @@ public class Executor {
 
             System.out.printf("\nEstimate %d duration: %d ms", i, System.currentTimeMillis() - start);
 
-//            powerSystem.printStateInExternalInPolarDegree();
+            powerSystem.printStateInExternalInPolarDegree();
 
             Thread.sleep(500);
 
