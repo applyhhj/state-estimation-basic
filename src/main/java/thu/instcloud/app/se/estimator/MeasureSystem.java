@@ -15,6 +15,7 @@ import static thu.instcloud.app.se.common.Utils.Common.comparator;
 import static thu.instcloud.app.se.common.Utils.MatrixExtension.toMeasurementVector;
 import static thu.instcloud.app.se.common.Utils.OJ.cplxMatrixPart;
 import static thu.instcloud.app.se.common.Utils.OJ.newOneRealBasicMatrix;
+import static thu.instcloud.app.se.common.Utils.hasDuplicateElement;
 
 /**
  * Created on 2015/11/7.
@@ -89,8 +90,6 @@ public class MeasureSystem extends OjMatrixManipulator {
 
         nz = 4 * powerSystem.getMpData().getnBranch() + 4 * powerSystem.getMpData().getnBus();
 
-        zmRealBuilder = basicRealMatrixFactory.getBuilder(nz, 1);
-
         importTrueMeasurement();
 
         generateSigma();
@@ -135,6 +134,8 @@ public class MeasureSystem extends OjMatrixManipulator {
 
     public void measure() {
 
+        zmRealBuilder = basicRealMatrixFactory.getBuilder(nz, 1);
+
         for (int i = 0; i < nz; i++) {
 
             zmRealBuilder.set(i, 0, getMeasureI(i));
@@ -146,6 +147,13 @@ public class MeasureSystem extends OjMatrixManipulator {
     }
 
     private double getMeasureI(int i) {
+
+        if (powerSystem.getOption().isDebug()) {
+
+//            use true measurement to debug
+            return zTrueReal.get(i, 0).doubleValue();
+
+        }
 
         return random.nextGaussian() * sigmaReal.get(i, 0).doubleValue() + zTrueReal.get(i, 0).doubleValue();
 
@@ -198,6 +206,10 @@ public class MeasureSystem extends OjMatrixManipulator {
             }
 
         }
+
+        hasDuplicateElement(excludeIdxSf, "sf");
+
+        hasDuplicateElement(excludeIdxSt, "st");
 
         VbusExcludeIds.add(refNumI - 1);
 
@@ -259,6 +271,12 @@ public class MeasureSystem extends OjMatrixManipulator {
 
         VbusExcludeIds.sort(comparator);
 
+        hasDuplicateElement(zExcludeIds, "z");
+
+        hasDuplicateElement(stateExcludeIds, "state");
+
+        hasDuplicateElement(VbusExcludeIds, "vbus");
+
     }
 
     public int getNz() {
@@ -281,9 +299,9 @@ public class MeasureSystem extends OjMatrixManipulator {
         return zmReal;
     }
 
-    public BasicMatrix getzTrueReal() {
-        return zTrueReal;
-    }
+//    public BasicMatrix getzTrueReal() {
+//        return zTrueReal;
+//    }
 
     public List<Integer> getVbusExcludeIds() {
         return VbusExcludeIds;

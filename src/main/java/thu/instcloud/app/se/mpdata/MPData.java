@@ -7,7 +7,7 @@ import thu.instcloud.app.se.common.Constants;
 import java.util.ArrayList;
 import java.util.List;
 
-import static thu.instcloud.app.se.common.Utils.readStringFromFile;
+import static thu.instcloud.app.se.common.Utils.Common.readStringFromFile;
 
 /**
  * Created on 2015/11/6.

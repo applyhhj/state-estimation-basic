@@ -236,27 +236,30 @@ public class YMatrix extends OjMatrixManipulator {
 
         int nbu = mpData.getBusData().getN();
 
-        basicRealMatrixBuilder = basicRealMatrixFactory.getBuilder(nbr, nbu);
+        basicComplexMatrixBuilder = basicComplexMatrixFactory.getBuilder(nbr, nbu);
 
         for (int i = 0; i < nbr; i++) {
 
 //            convert external bus number to internal bus number, convert to index
-            basicRealMatrixBuilder.set(i, mpData.getBusData().getTOI().get(mpData.getBranchData().getI()[i]) - 1, 1);
+            basicComplexMatrixBuilder.set(i, mpData.getBusData().getTOI().get(mpData.getBranchData().getI()[i]) - 1,
+                    new ComplexNumber(1, 0));
 
         }
 
-        cf = basicRealMatrixBuilder.build();
+        cf = basicComplexMatrixBuilder.build();
 
-        basicRealMatrixBuilder = basicRealMatrixFactory.getBuilder(nbr, nbu);
+        basicComplexMatrixBuilder = basicComplexMatrixFactory.getBuilder(nbr, nbu);
 
         for (int i = 0; i < nbr; i++) {
 
 //            convert external bus number to internal bus number, convert to index
-            basicRealMatrixBuilder.set(i, mpData.getBusData().getTOI().get(mpData.getBranchData().getJ()[i]) - 1, 1);
+            basicComplexMatrixBuilder.set(i, mpData.getBusData().getTOI().get(mpData.getBranchData().getJ()[i]) - 1,
+                    new ComplexNumber(1, 0));
 
         }
 
-        ct = basicRealMatrixBuilder.build();
+        ct = basicComplexMatrixBuilder.build();
+
     }
 
     public BasicMatrix getYbus() {

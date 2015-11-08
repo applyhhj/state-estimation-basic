@@ -105,9 +105,9 @@ public class PowerFlow extends OjMatrixManipulator {
     //    for comparison
     private void importPQ() {
 
-        basicRealMatrixBuilder = basicRealMatrixFactory.getBuilder(mpData.getnBranch(), 1);
-
         for (int j = 0; j < 4; j++) {
+
+            basicRealMatrixBuilder = basicRealMatrixFactory.getBuilder(mpData.getnBranch(), 1);
 
             for (int i = 0; i < mpData.getnBranch(); i++) {
 

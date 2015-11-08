@@ -19,7 +19,7 @@ public class Executor {
 
         } else {
 
-            fpath = "F:\\projects\\data\\matpower-data-process\\data\\case118.txt";
+            fpath = "F:\\projects\\data\\matpower-data-process\\data\\case300.txt";
 
         }
 
@@ -27,13 +27,15 @@ public class Executor {
 
         option.setVerbose(true);
 
+        option.setDebug(false);
+
         PowerSystem powerSystem = new PowerSystem(fpath, option);
 
         int i = 0;
 
         long start;
 
-        while (i++ < 100) {
+        while (i++ < 3) {
 
             start = System.currentTimeMillis();
 

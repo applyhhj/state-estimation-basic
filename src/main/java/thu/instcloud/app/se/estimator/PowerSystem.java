@@ -122,7 +122,7 @@ public class PowerSystem extends OjMatrixManipulator {
     //    use a complex matrix to store state in polar axis, real part is the magnitude and imaginary part is the phase angle
     public BasicMatrix printStateInExternalInPolarDegree() {
 
-        System.out.print("\nBusNum       Vm        Va\n");
+        System.out.print("\nBusNum       Vm(p.u.)        Va(degree)\n");
 
         basicComplexMatrixBuilder = basicComplexMatrixFactory.getBuilder((int) state.countRows());
 
@@ -162,7 +162,7 @@ public class PowerSystem extends OjMatrixManipulator {
 
             System.out.printf("%5d %8.4f   %8.4f\n", sortExternalBusNum.get(i),
                     retCplx.get(internalNum - 1, 0).getReal(),
-                    retCplx.get(internalNum - 1, 0).getImaginary());
+                    retCplx.get(internalNum - 1, 0).getImaginary() * 180 / Math.PI);
 
         }
 

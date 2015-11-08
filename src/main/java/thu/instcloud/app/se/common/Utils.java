@@ -17,6 +17,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 import static thu.instcloud.app.se.common.Utils.OJ.cplxMatrixPart;
@@ -25,6 +26,33 @@ import static thu.instcloud.app.se.common.Utils.OJ.cplxMatrixPart;
  * Created on 2015/11/6.
  */
 public class Utils {
+
+    //    test test
+    public static boolean hasDuplicateElement(List<Integer> list, String title) {
+
+        List<Integer> newlist = new ArrayList<Integer>();
+
+        newlist.addAll(list);
+
+        while (newlist.size() > 1) {
+
+            int tmp = newlist.get(0);
+
+            newlist.remove(0);
+
+            if (newlist.contains(tmp)) {
+
+                System.out.print(title + " has duplicate element\n");
+
+                return true;
+
+            }
+
+        }
+
+        return false;
+
+    }
 
     public static class Common {
 
@@ -101,9 +129,11 @@ public class Utils {
 
             double ele, ret = Double.MIN_VALUE;
 
-            while (matrix.iterator().hasNext()) {
+            Iterator<Number> iterator = matrix.iterator();
 
-                ele = matrix.iterator().next().doubleValue();
+            while (iterator.hasNext()) {
+
+                ele = iterator.next().doubleValue();
 
                 if (ret < ele) {
 
@@ -199,7 +229,15 @@ public class Utils {
 
                 }
 
-                ret = thisMatrix.selectColumns(selcs);
+                if (ret != null) {
+
+                    ret = ret.selectColumns(selcs);
+
+                } else {
+
+                    ret = thisMatrix.selectColumns(selcs);
+
+                }
 
             }
 
@@ -234,6 +272,24 @@ public class Utils {
         private static final BasicMatrix.Factory<PrimitiveMatrix> basicRealMatrix2dFactory = PrimitiveMatrix.FACTORY;
 
         private static Access2D.Builder<PrimitiveMatrix> basicRealMatrix2dBuilder;
+
+        public static void printOjMatrix(BasicMatrix matrix) {
+
+            System.out.print("\n");
+
+            for (int i = 0; i < matrix.countRows(); i++) {
+
+                for (int j = 0; j < matrix.countColumns(); j++) {
+
+                    System.out.print(matrix.get(i, j) + "    ");
+
+                }
+
+                System.out.print("\n");
+
+            }
+
+        }
 
         public static BasicMatrix newRealBasicMatrix(double[][] array2d) {
 

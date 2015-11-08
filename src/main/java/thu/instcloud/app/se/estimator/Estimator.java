@@ -12,12 +12,12 @@ import thu.instcloud.app.se.common.Constants;
 import thu.instcloud.app.se.common.OjMatrixManipulator;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static thu.instcloud.app.se.common.Utils.MatrixExtension.*;
 import static thu.instcloud.app.se.common.Utils.OJ.*;
+import static thu.instcloud.app.se.common.Utils.hasDuplicateElement;
 
 /**
  * Created on 2015/11/7.
@@ -60,6 +60,8 @@ public class Estimator extends OjMatrixManipulator {
 
     private boolean oneBadAtATime;
 
+    private int ibad;
+
     private int maxItBadData;
 
     private int maxIt;
@@ -76,8 +78,6 @@ public class Estimator extends OjMatrixManipulator {
 
         composeFullHMatrix();
 
-        converged = false;
-
         oneBadAtATime = false;
 
         maxItBadData = 50;
@@ -92,23 +92,29 @@ public class Estimator extends OjMatrixManipulator {
 
     public void estimate() {
 
+        converged = false;
+
         WInvReal = powerSystem.getMeasureSystem().getWInvReal();
 
-        int ibad = 1;
+        ibad = 1;
 
         boolean hasBadData;
 
         BasicMatrix zestReal = computeEstimatedMeasurement(powerSystem);
 
-        BasicMatrix deltzReal = powerSystem.getMeasureSystem().getzTrueReal().subtract(zestReal);
+        BasicMatrix deltzReal = powerSystem.getMeasureSystem().getZmReal().subtract(zestReal);
 
         BasicMatrix normFReal = deltzReal.transpose().multiply(WInvReal).multiply(deltzReal);
 
-        System.out.printf("\n it     norm( F )       step size");
+        if (powerSystem.getOption().isVerbose()) {
 
-        System.out.printf("\n----  --------------  --------------");
+            System.out.printf("\n it     norm( F )       step size");
 
-        System.out.printf("\n%3d    %10.3f      %10.3f", 0, normFReal.get(0, 0), 0.0);
+            System.out.printf("\n----  --------------  --------------");
+
+            System.out.printf("\n%3d    %10.3f      %10.3f", 0, normFReal.get(0, 0), 0.0);
+
+        }
 
         while (!converged && ibad < maxItBadData) {
 
@@ -144,7 +150,7 @@ public class Estimator extends OjMatrixManipulator {
 
                 zestReal = computeEstimatedMeasurement(powerSystem);
 
-                deltzReal = powerSystem.getMeasureSystem().getzTrueReal().subtract(zestReal);
+                deltzReal = powerSystem.getMeasureSystem().getZmReal().subtract(zestReal);
 
                 ddeltz = getDdeltz(deltzReal);
 
@@ -152,7 +158,11 @@ public class Estimator extends OjMatrixManipulator {
 
                 BasicMatrix dx2 = dx.transpose().multiply(dx);
 
-                System.out.printf("\n%3d    %10.3f      %10.3f", i, normFReal.get(0, 0), dx2.get(0, 0));
+                if (powerSystem.getOption().isVerbose()) {
+
+                    System.out.printf("\n%3d    %10.3f      %10.3e", i, normFReal.get(0, 0), dx2.get(0, 0));
+
+                }
 
                 if (dx2.get(0, 0).doubleValue() < Constants.ESTIMATOR.TOL) {
 
@@ -160,18 +170,17 @@ public class Estimator extends OjMatrixManipulator {
 
                     if (powerSystem.getOption().isVerbose()) {
 
-                        System.out.printf("\nState estimator converged in %d iterations.", i);
+                        System.out.printf("\nState estimator converged in %d iterations.\n", i);
 
                     }
 
                 }
 
-
             }
 
             if (!converged && powerSystem.getOption().isVerbose()) {
 
-                System.out.printf("\nState estimator did not converged in %d iterations.", i);
+                System.out.printf("\nState estimator did not converged in %d iterations.\n", i);
 
             }
 
@@ -188,7 +197,7 @@ public class Estimator extends OjMatrixManipulator {
 
             double maxBad = maxInMatrix(rN2);
 
-            Map<Integer, Double> baddata = badDataRecognition(rN2, oneBadAtATime);
+            List<Integer> baddata = badDataRecognition(rN2, oneBadAtATime);
 
             if (baddata.size() > 0) {
 
@@ -253,27 +262,27 @@ public class Estimator extends OjMatrixManipulator {
     }
 
     //    WARNNING: all exclude should be sorted in ascending order
-    private void updateZExclude(Map<Integer, Double> baddata, List<Integer> zExclude) {
+    private void updateZExclude(List<Integer> baddata, List<Integer> zExclude) {
 
         List<Integer> badids = new ArrayList<Integer>();
 
-        int excluded;
+        int originalIdx;
 
-        for (Map.Entry<Integer, Double> e : baddata.entrySet()) {
+        for (int i = 0; i < baddata.size(); i++) {
 
-            excluded = 0;
+            originalIdx = baddata.get(i);
 
-            for (Integer exczi : zExclude) {
+            for (int j = 0; j < zExclude.size(); j++) {
 
-                if (e.getKey() >= exczi) {
+                if (originalIdx >= zExclude.get(j)) {
 
-                    excluded++;
+                    originalIdx++;
 
                 }
 
             }
 
-            badids.add(e.getKey() + excluded);
+            badids.add(originalIdx);
 
         }
 
@@ -311,11 +320,14 @@ public class Estimator extends OjMatrixManipulator {
 
         }
 
+        hasDuplicateElement(zExclude, "update " + ibad);
+
     }
 
-    private Map<Integer, Double> badDataRecognition(BasicMatrix rn2, boolean oneBadAtATime) {
+    //    just return the index
+    private List<Integer> badDataRecognition(BasicMatrix rn2, boolean oneBadAtATime) {
 
-        Map<Integer, Double> ret = new HashMap<Integer, Double>();
+        List<Integer> ret = new ArrayList<Integer>();
 
         double threshold, tmp;
 
@@ -335,7 +347,13 @@ public class Estimator extends OjMatrixManipulator {
 
             if (tmp >= threshold) {
 
-                ret.put(i, tmp);
+                ret.add(i);
+
+                if (oneBadAtATime) {
+
+                    break;
+
+                }
 
             }
 
@@ -405,7 +423,7 @@ public class Estimator extends OjMatrixManipulator {
 
     private BasicMatrix getDdxa(BasicMatrix dx) {
 
-        if (dx.countRows() % 2 != 0 || dx.countRows() != 1) {
+        if (dx.countRows() % 2 != 0 || dx.countColumns() != 1) {
 
             logger.error("Number of state variable should be even and dx should be single column!");
 
@@ -419,7 +437,7 @@ public class Estimator extends OjMatrixManipulator {
 
     private BasicMatrix getDdxm(BasicMatrix dx) {
 
-        if (dx.countRows() % 2 != 0 || dx.countRows() != 1) {
+        if (dx.countRows() % 2 != 0 || dx.countColumns() != 1) {
 
             logger.error("Number of state variable should be even and dx should be single column!");
 
@@ -620,9 +638,9 @@ public class Estimator extends OjMatrixManipulator {
 
         It = Yt.multiply(VpfCplx);
 
-        IfMatrix = expandVectorToDiagonalMatrix(If);
+        IfMatrix = expandVectorToDiagonalMatrix(If, true);
 
-        ItMatrix = expandVectorToDiagonalMatrix(It);
+        ItMatrix = expandVectorToDiagonalMatrix(It, true);
 
         Vf = getVft(powerSystem.getMpData().getBranchData().getI(), VpfCplx, powerSystem.getMpData().getBusData().getTOI());
 
@@ -632,9 +650,9 @@ public class Estimator extends OjMatrixManipulator {
 
         VtNorm = getVft(powerSystem.getMpData().getBranchData().getJ(), VpfNormCplx, powerSystem.getMpData().getBusData().getTOI());
 
-        VfMatrix = expandVectorToDiagonalMatrix(Vf);
+        VfMatrix = expandVectorToDiagonalMatrix(Vf, true);
 
-        VtMatrix = expandVectorToDiagonalMatrix(Vt);
+        VtMatrix = expandVectorToDiagonalMatrix(Vt, true);
 
         int NBranch = powerSystem.getMpData().getnBranch();
 
@@ -650,16 +668,8 @@ public class Estimator extends OjMatrixManipulator {
 
             idxBranch[i] = i;
 
-        }
-
-        for (int i = 0; i < NBranch; i++) {
-
             idxBusFInter[i] = powerSystem.getMpData().getBusData().getTOI().get(
                     powerSystem.getMpData().getBranchData().getI()[i]) - 1;
-
-        }
-
-        for (int i = 0; i < NBranch; i++) {
 
             idxBusTInter[i] = powerSystem.getMpData().getBusData().getTOI().get(
                     powerSystem.getMpData().getBranchData().getJ()[i]) - 1;
@@ -678,14 +688,14 @@ public class Estimator extends OjMatrixManipulator {
 
         dSfDvaCplx = IfMatrix.modify(ComplexFunction.CONJUGATE).multiply(VNbrNbF)
                 .subtract(VfMatrix.multiply(Yf.multiply(VpfMatrixCplx).modify(ComplexFunction.CONJUGATE)))
-                .conjugate().multiply(-1);
+                .multiply((Number) new ComplexNumber(0, 1));
 
         dSfDvmCplx = VfMatrix.multiply(Yf.multiply(VpfNormMatrixCplx).modify(ComplexFunction.CONJUGATE))
                 .add(IfMatrix.modify(ComplexFunction.CONJUGATE).multiply(VNbrNbNormF));
 
         dStDvaCplx = ItMatrix.modify(ComplexFunction.CONJUGATE).multiply(VNbrNbT)
                 .subtract(VtMatrix.multiply(Yt.multiply(VpfMatrixCplx).modify(ComplexFunction.CONJUGATE)))
-                .conjugate().multiply(-1);
+                .multiply((Number) new ComplexNumber(0, 1));
 
         dStDvmCplx = VtMatrix.multiply(Yt.multiply(VpfNormMatrixCplx).modify(ComplexFunction.CONJUGATE))
                 .add(ItMatrix.modify(ComplexFunction.CONJUGATE).multiply(VNbrNbNormT));
@@ -704,18 +714,17 @@ public class Estimator extends OjMatrixManipulator {
 
         VpfNormCplx = computeVnorm(VpfCplx);
 
-        VpfMatrixCplx = expandVectorToDiagonalMatrix(VpfCplx);
+        VpfMatrixCplx = expandVectorToDiagonalMatrix(VpfCplx, true);
 
-        IbusMatrix = expandVectorToDiagonalMatrix(powerSystem.getyMatrix().getYbus().multiply(VpfCplx));
+        IbusMatrix = expandVectorToDiagonalMatrix(powerSystem.getyMatrix().getYbus().multiply(VpfCplx), true);
 
-        VpfNormMatrixCplx = expandVectorToDiagonalMatrix(VpfNormCplx);
+        VpfNormMatrixCplx = expandVectorToDiagonalMatrix(VpfNormCplx, true);
 
         dSbDvmCplx = VpfMatrixCplx.multiply(powerSystem.getyMatrix().getYbus().multiply(VpfNormMatrixCplx)
                 .modify(ComplexFunction.CONJUGATE))
-                .add(IbusMatrix.modify(ComplexFunction.CONJUGATE).multiply(VpfNormMatrixCplx)
-                );
+                .add(IbusMatrix.modify(ComplexFunction.CONJUGATE).multiply(VpfNormMatrixCplx));
 
-        dSbDvaCplx = VpfMatrixCplx.conjugate().multiply(-1).multiply(
+        dSbDvaCplx = VpfMatrixCplx.multiply((Number) new ComplexNumber(0, 1)).multiply(
                 IbusMatrix.subtract(powerSystem.getyMatrix().getYbus().multiply(VpfMatrixCplx))
                         .modify(ComplexFunction.CONJUGATE)
         );
@@ -745,7 +754,7 @@ public class Estimator extends OjMatrixManipulator {
 
     }
 
-    private BasicMatrix expandVectorToDiagonalMatrix(BasicMatrix vec) {
+    private BasicMatrix expandVectorToDiagonalMatrix(BasicMatrix vec, boolean complex) {
 
         if (vec.countColumns() != 1) {
 
@@ -755,7 +764,33 @@ public class Estimator extends OjMatrixManipulator {
 
         }
 
-        return basicRealMatrixFactory.makeEye(vec.countRows(), vec.countRows()).multiply(vec);
+        int rows = (int) vec.countRows();
+
+        if (!complex) {
+
+            basicRealMatrixBuilder = basicRealMatrixFactory.getBuilder(rows, rows);
+
+            for (int i = 0; i < rows; i++) {
+
+                basicRealMatrixBuilder.set(i, i, vec.get(i, 0));
+
+            }
+
+            return basicRealMatrixBuilder.build();
+
+        } else {
+
+            basicComplexMatrixBuilder = basicComplexMatrixFactory.getBuilder(rows, rows);
+
+            for (int i = 0; i < rows; i++) {
+
+                basicComplexMatrixBuilder.set(i, i, vec.get(i, 0));
+
+            }
+
+            return basicComplexMatrixBuilder.build();
+
+        }
 
     }
 
