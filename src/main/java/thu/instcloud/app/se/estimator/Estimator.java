@@ -185,19 +185,7 @@ public class Estimator extends OjMatrixManipulator {
             }
 
 //            checking bad data
-            BasicMatrix WW = computeWW(WWInv);
-
-            BasicMatrix HTWHInv = HH.transpose().multiply(WWInv).multiply(HH).invert();
-
-            BasicMatrix WR = WW.subtract(HH.multiply(HTWHInv).multiply(HH.transpose()).multiply(0.95));
-
-            BasicMatrix WRInvDiagVec = getDiagonalInvVector(WR);
-
-            BasicMatrix rN2 = ddeltz.multiplyElements(ddeltz).multiplyElements(WRInvDiagVec);
-
-            double maxBad = maxInMatrix(rN2);
-
-            List<Integer> baddata = badDataRecognition(rN2, oneBadAtATime);
+            List<Integer> baddata = badDataRecognition(WWInv, HH, ddeltz, oneBadAtATime);
 
             if (baddata.size() > 0) {
 
@@ -325,7 +313,19 @@ public class Estimator extends OjMatrixManipulator {
     }
 
     //    just return the index
-    private List<Integer> badDataRecognition(BasicMatrix rn2, boolean oneBadAtATime) {
+    private List<Integer> badDataRecognition(BasicMatrix WWInv, BasicMatrix HH, BasicMatrix ddeltz, boolean oneBadAtATime) {
+
+        BasicMatrix WW = computeWW(WWInv);
+
+        BasicMatrix HTWHInv = HH.transpose().multiply(WWInv).multiply(HH).invert();
+
+        BasicMatrix WR = WW.subtract(HH.multiply(HTWHInv).multiply(HH.transpose()).multiply(0.95));
+
+        BasicMatrix WRInvDiagVec = getDiagonalInvVector(WR);
+
+        BasicMatrix rn2 = ddeltz.multiplyElements(ddeltz).multiplyElements(WRInvDiagVec);
+
+        double maxBad = maxInMatrix(rn2);
 
         List<Integer> ret = new ArrayList<Integer>();
 

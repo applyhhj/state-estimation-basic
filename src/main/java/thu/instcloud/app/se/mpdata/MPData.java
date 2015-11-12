@@ -1,7 +1,5 @@
 package thu.instcloud.app.se.mpdata;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import thu.instcloud.app.se.common.Constants;
 
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ import static thu.instcloud.app.se.common.Utils.Common.readStringFromFile;
  */
 public class MPData {
 
-    private static Logger logger = LoggerFactory.getLogger(MPData.class);
+//    private static Logger logger = LoggerFactory.getLogger(MPData.class);
 
     private BranchData branchData;
 
@@ -192,7 +190,7 @@ public class MPData {
 
             if (!end) {
 
-                logger.error("Section {} has no end", entry);
+                System.out.print("Error: Section " + entry + " has no end");
 
                 return;
 
