@@ -19,15 +19,15 @@ public class Executor {
 
         } else {
 
-            fpath = "F:\\projects\\data\\matpower-data-process\\data\\case300.txt";
+            fpath = "F:\\projects\\data\\matpower-data-process\\data\\case89pegase.txt";
 
         }
 
         EstimationOption option = new EstimationOption();
 
-        option.setVerbose(true);
+        option.setVerbose(false);
 
-        option.setDebug(false);
+        option.setDebug(true);
 
         PowerSystem powerSystem = new PowerSystem(fpath, option);
 
@@ -35,7 +35,7 @@ public class Executor {
 
         long start;
 
-        while (i++ < 3) {
+        while (i++ <2) {
 
             start = System.currentTimeMillis();
 
@@ -49,7 +49,7 @@ public class Executor {
 
         }
 
-        System.out.print("Done!\n");
+        System.out.print("\nDone!\n");
 
     }
 

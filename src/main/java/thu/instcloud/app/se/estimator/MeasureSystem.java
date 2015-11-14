@@ -6,16 +6,12 @@ import org.ojalgo.matrix.BasicMatrix;
 import org.ojalgo.matrix.PrimitiveMatrix;
 import thu.instcloud.app.se.common.OjMatrixManipulator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 import static thu.instcloud.app.se.common.Utils.Common.comparator;
 import static thu.instcloud.app.se.common.Utils.MatrixExtension.toMeasurementVector;
 import static thu.instcloud.app.se.common.Utils.OJ.cplxMatrixPart;
 import static thu.instcloud.app.se.common.Utils.OJ.newOneRealBasicMatrix;
-import static thu.instcloud.app.se.common.Utils.hasDuplicateElement;
 
 /**
  * Created on 2015/11/7.
@@ -98,7 +94,7 @@ public class MeasureSystem extends OjMatrixManipulator {
 
         computeExcludeIndices();
 
-//        print();
+        print();
 
     }
 
@@ -206,10 +202,10 @@ public class MeasureSystem extends OjMatrixManipulator {
             }
 
         }
-
-        hasDuplicateElement(excludeIdxSf, "sf");
-
-        hasDuplicateElement(excludeIdxSt, "st");
+//
+//        hasDuplicateElement(excludeIdxSf, "sf");
+//
+//        hasDuplicateElement(excludeIdxSt, "st");
 
         VbusExcludeIds.add(refNumI - 1);
 
@@ -265,17 +261,20 @@ public class MeasureSystem extends OjMatrixManipulator {
 
         }
 
-        zExcludeIds.sort(comparator);
+//        zExcludeIds.sort(comparator);
+        Collections.sort(zExcludeIds,comparator);
 
-        stateExcludeIds.sort(comparator);
+//        stateExcludeIds.sort(comparator);
+        Collections.sort(stateExcludeIds,comparator);
 
-        VbusExcludeIds.sort(comparator);
+//        VbusExcludeIds.sort(comparator);
+        Collections.sort(VbusExcludeIds,comparator);
 
-        hasDuplicateElement(zExcludeIds, "z");
-
-        hasDuplicateElement(stateExcludeIds, "state");
-
-        hasDuplicateElement(VbusExcludeIds, "vbus");
+//        hasDuplicateElement(zExcludeIds, "z");
+//
+//        hasDuplicateElement(stateExcludeIds, "state");
+//
+//        hasDuplicateElement(VbusExcludeIds, "vbus");
 
     }
 

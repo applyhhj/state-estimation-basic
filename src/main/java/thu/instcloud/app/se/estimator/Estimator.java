@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static thu.instcloud.app.se.common.Utils.MatrixExtension.*;
 import static thu.instcloud.app.se.common.Utils.OJ.*;
-import static thu.instcloud.app.se.common.Utils.hasDuplicateElement;
 
 /**
  * Created on 2015/11/7.
@@ -86,7 +85,7 @@ public class Estimator extends OjMatrixManipulator {
 
         badDataThreshold = 6.25;
 
-//        print();
+        print();
 
     }
 
@@ -308,7 +307,7 @@ public class Estimator extends OjMatrixManipulator {
 
         }
 
-        hasDuplicateElement(zExclude, "update " + ibad);
+//        hasDuplicateElement(zExclude, "update " + ibad);
 
     }
 
@@ -553,7 +552,8 @@ public class Estimator extends OjMatrixManipulator {
     public void printWithTitle(String title, BasicMatrix matrix) {
 
         System.out.print("\n" + title + "\n");
-        System.out.print(matrix + "\n");
+
+        printOjMatrix(matrix);
 
     }
 

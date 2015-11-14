@@ -138,11 +138,11 @@ public class YMatrix extends OjMatrixManipulator {
 
     private void print() {
 
-        System.out.print("cf\n" + cf.toString() + "\n");
-
-        System.out.print("ct\n" + ct.toString() + "\n");
-
-        System.out.print("YSh\n" + YSh.toString() + "\n");
+//        System.out.print("cf\n" + cf.toString() + "\n");
+//
+//        System.out.print("ct\n" + ct.toString() + "\n");
+//
+//        System.out.print("YSh\n" + YSh.toString() + "\n");
 
 //        System.out.print("YShB\n" + YShB.toString() + "\n");
 

@@ -11,6 +11,7 @@ import thu.instcloud.app.se.mpdata.PowerFlow;
 import thu.instcloud.app.se.mpdata.YMatrix;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -147,8 +148,9 @@ public class PowerSystem extends OjMatrixManipulator {
             sortExternalBusNum.add(i);
 
         }
-
-        sortExternalBusNum.sort(Utils.Common.comparator);
+//
+//        sortExternalBusNum.sort(Utils.Common.comparator);
+        Collections.sort(sortExternalBusNum,Utils.Common.comparator);
 
         BasicMatrix ret = basicComplexMatrixBuilder.build();
 

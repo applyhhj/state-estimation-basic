@@ -27,33 +27,6 @@ import static thu.instcloud.app.se.common.Utils.OJ.cplxMatrixPart;
  */
 public class Utils {
 
-    //    test test
-    public static boolean hasDuplicateElement(List<Integer> list, String title) {
-
-        List<Integer> newlist = new ArrayList<Integer>();
-
-        newlist.addAll(list);
-
-        while (newlist.size() > 1) {
-
-            int tmp = newlist.get(0);
-
-            newlist.remove(0);
-
-            if (newlist.contains(tmp)) {
-
-                System.out.print(title + " has duplicate element\n");
-
-                return true;
-
-            }
-
-        }
-
-        return false;
-
-    }
-
     public static class Common {
 
         public static IntComparator comparator = new IntComparator();
